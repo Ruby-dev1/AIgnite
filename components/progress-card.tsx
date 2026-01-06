@@ -1,5 +1,7 @@
 "use client"
 
+import { motion } from "framer-motion"
+
 interface ProgressCardProps {
   name: string
   progress: number
@@ -14,17 +16,25 @@ export default function ProgressCard({ name, progress }: ProgressCardProps) {
   }
 
   return (
-    <div className="bg-card rounded-lg p-4 shadow-sm border border-border">
-      <div className="flex items-center justify-between mb-2">
-        <p className="font-semibold text-foreground">{name}</p>
-        <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">{progress}%</span>
+    <motion.div
+      whileHover={{ scale: 1.01, x: 5 }}
+      className="bg-white dark:bg-slate-900/50 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 backdrop-blur-sm transition-shadow hover:shadow-md"
+    >
+      <div className="flex items-center justify-between mb-3">
+        <p className="font-bold text-slate-800 dark:text-slate-200">{name}</p>
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">{progress}%</span>
+          <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+        </div>
       </div>
-      <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
-        <div
-          className={`h-full bg-gradient-to-r ${getColor(progress)} transition-all duration-500`}
-          style={{ width: `${progress}%` }}
+      <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden p-0.5">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+          className={`h-full bg-gradient-to-r ${getColor(progress)} rounded-full shadow-[0_0_10px_rgba(0,0,0,0.1)]`}
         />
       </div>
-    </div>
+    </motion.div>
   )
 }
