@@ -1,4 +1,4 @@
-# Gamified Career App
+# AIgnite - CareerQuest
 
 A futuristic, gamified career exploration platform designed to help users discover their potential, set goals, and navigate their professional journey with the help of AI.
 
