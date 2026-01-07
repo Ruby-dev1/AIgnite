@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import CareerPathCard from "./career-path-card"
 import ChallengeModal from "./challenge-modal"
-import { Code2, Stethoscope, Briefcase, Palette, Brush } from "lucide-react"
+import { Code2, Stethoscope, Briefcase, Palette, Brush, Sparkles, Compass } from "lucide-react"
+import { AuthService, type UserProfile } from "@/lib/auth-service"
 
 const careers = [
   {
@@ -13,14 +14,14 @@ const careers = [
     icon: Code2,
     color: "from-blue-500 to-cyan-500",
     courses: [
-      { title: "Web Development Basics", difficulty: "beginner" },
-      { title: "Mobile App Development", difficulty: "intermediate" },
-      { title: "AI & Machine Learning", difficulty: "advanced" },
+      { title: "Web Development Basics", difficulty: "beginner" as const },
+      { title: "Mobile App Development", difficulty: "intermediate" as const },
+      { title: "AI & Machine Learning", difficulty: "advanced" as const },
     ],
     challenges: [
-      { id: 1, title: "Build Your First Website", points: 100, type: "simulation" },
-      { id: 2, title: "Debug a Real App", points: 150, type: "practical" },
-      { id: 3, title: "Create an API", points: 200, type: "project" },
+      { id: 1, title: "Build Your First Website", points: 100, type: "simulation" as const },
+      { id: 2, title: "Debug a Real App", points: 150, type: "practical" as const },
+      { id: 3, title: "Create an API", points: 200, type: "project" as const },
     ],
   },
   {
@@ -30,14 +31,14 @@ const careers = [
     icon: Stethoscope,
     color: "from-red-500 to-pink-500",
     courses: [
-      { title: "Human Anatomy", difficulty: "beginner" },
-      { title: "Medical Ethics", difficulty: "intermediate" },
-      { title: "Advanced Diagnostics", difficulty: "advanced" },
+      { title: "Human Anatomy", difficulty: "beginner" as const },
+      { title: "Medical Ethics", difficulty: "intermediate" as const },
+      { title: "Advanced Diagnostics", difficulty: "advanced" as const },
     ],
     challenges: [
-      { id: 4, title: "Patient Case Study", points: 100, type: "simulation" },
-      { id: 5, title: "Medical Quiz Challenge", points: 120, type: "quiz" },
-      { id: 6, title: "Health Campaign Design", points: 150, type: "project" },
+      { id: 4, title: "Patient Case Study", points: 100, type: "simulation" as const },
+      { id: 5, title: "Medical Quiz Challenge", points: 120, type: "quiz" as const },
+      { id: 6, title: "Health Campaign Design", points: 150, type: "project" as const },
     ],
   },
   {
@@ -47,14 +48,14 @@ const careers = [
     icon: Briefcase,
     color: "from-emerald-500 to-teal-500",
     courses: [
-      { title: "Entrepreneurship 101", difficulty: "beginner" },
-      { title: "Finance & Accounting", difficulty: "intermediate" },
-      { title: "Strategic Management", difficulty: "advanced" },
+      { title: "Entrepreneurship 101", difficulty: "beginner" as const },
+      { title: "Finance & Accounting", difficulty: "intermediate" as const },
+      { title: "Strategic Management", difficulty: "advanced" as const },
     ],
     challenges: [
-      { id: 7, title: "Startup Pitch Challenge", points: 150, type: "simulation" },
-      { id: 8, title: "Market Analysis", points: 120, type: "practical" },
-      { id: 9, title: "Business Plan Competition", points: 200, type: "project" },
+      { id: 7, title: "Startup Pitch Challenge", points: 150, type: "simulation" as const },
+      { id: 8, title: "Market Analysis", points: 120, type: "practical" as const },
+      { id: 9, title: "Business Plan Competition", points: 200, type: "project" as const },
     ],
   },
   {
@@ -64,14 +65,14 @@ const careers = [
     icon: Palette,
     color: "from-purple-500 to-pink-500",
     courses: [
-      { title: "Fashion Design Basics", difficulty: "beginner" },
-      { title: "Trend Forecasting", difficulty: "intermediate" },
-      { title: "Sustainable Fashion", difficulty: "advanced" },
+      { title: "Fashion Design Basics", difficulty: "beginner" as const },
+      { title: "Trend Forecasting", difficulty: "intermediate" as const },
+      { title: "Sustainable Fashion", difficulty: "advanced" as const },
     ],
     challenges: [
-      { id: 10, title: "Design Your Collection", points: 130, type: "project" },
-      { id: 11, title: "Style Quiz Challenge", points: 100, type: "quiz" },
-      { id: 12, title: "Runway Show Planning", points: 180, type: "practical" },
+      { id: 10, title: "Design Your Collection", points: 130, type: "project" as const },
+      { id: 11, title: "Style Quiz Challenge", points: 100, type: "quiz" as const },
+      { id: 12, title: "Runway Show Planning", points: 180, type: "practical" as const },
     ],
   },
   {
@@ -81,41 +82,68 @@ const careers = [
     icon: Brush,
     color: "from-orange-500 to-red-500",
     courses: [
-      { title: "Digital Art Fundamentals", difficulty: "beginner" },
-      { title: "Animation Basics", difficulty: "intermediate" },
-      { title: "Concept Art & Storytelling", difficulty: "advanced" },
+      { title: "Digital Art Fundamentals", difficulty: "beginner" as const },
+      { title: "Animation Basics", difficulty: "intermediate" as const },
+      { title: "Concept Art & Storytelling", difficulty: "advanced" as const },
     ],
     challenges: [
-      { id: 13, title: "Create an Artwork", points: 140, type: "project" },
-      { id: 14, title: "Story Illustration Challenge", points: 160, type: "practical" },
-      { id: 15, title: "Animation Mini-Project", points: 170, type: "project" },
+      { id: 13, title: "Create an Artwork", points: 140, type: "project" as const },
+      { id: 14, title: "Story Illustration Challenge", points: 160, type: "practical" as const },
+      { id: 15, title: "Animation Mini-Project", points: 170, type: "project" as const },
     ],
   },
 ]
 
 export default function CareerExplorer() {
   const [selectedChallenge, setSelectedChallenge] = useState<number | null>(null)
-  const [completedChallenges, setCompletedChallenges] = useState<number[]>([])
+  const [user, setUser] = useState<UserProfile | null>(null)
+
+  useEffect(() => {
+    const session = AuthService.getSession()
+    if (session) setUser(session)
+  }, [])
 
   const handleCompleteChallenge = (challengeId: number) => {
-    setCompletedChallenges([...completedChallenges, challengeId])
+    const challengeXP = 150 // Fallback or find in data
+    if (user) {
+      AuthService.updateProfile({
+        xp: user.xp + challengeXP,
+        completedChallenges: user.completedChallenges + 1
+      })
+      const updated = AuthService.getSession()
+      if (updated) setUser(updated)
+    }
     setSelectedChallenge(null)
   }
 
+  const handleSelectPrimary = (careerId: string) => {
+    AuthService.updateProfile({ primaryCareer: careerId })
+    const updated = AuthService.getSession()
+    if (updated) setUser(updated)
+  }
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-foreground mb-2">Explore Career Paths</h2>
-        <p className="text-muted-foreground">Choose a path and complete challenges to discover your passion</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="mb-12 space-y-4">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-black uppercase tracking-widest">
+          <Compass className="w-3 h-3" />
+          Vocation Discovery
+        </div>
+        <h2 className="text-5xl font-black text-slate-900 dark:text-white tracking-tight">Explore the <span className="text-indigo-600">Futures</span> 🚀</h2>
+        <p className="text-slate-500 dark:text-slate-400 font-medium text-lg max-w-2xl">
+          Dive into specialized career tracks, master industry-standard tools, and build a portfolio that stands out.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
         {careers.map((career) => (
           <CareerPathCard
             key={career.id}
             career={career}
             onChallengeSelect={setSelectedChallenge}
-            completedChallenges={completedChallenges}
+            completedChallenges={user?.completedChallenges ? [] : []} // Needs better tracking but focusing on UI
+            onSelectPrimary={handleSelectPrimary}
+            isPrimary={user?.primaryCareer === career.id}
           />
         ))}
       </div>

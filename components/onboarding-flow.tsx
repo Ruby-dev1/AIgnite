@@ -12,7 +12,8 @@ import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface OnboardingFlowProps {
-    onComplete: (recommendation: CareerRecommendation) => void
+    onComplete: (recommendation: CareerRecommendation, userData: UserProfile) => void
+    onSkip: () => void
 }
 
 const steps = [
@@ -23,7 +24,7 @@ const steps = [
     { title: "ECA", icon: Users },
 ]
 
-export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
+export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
     const [step, setStep] = useState(0)
     const [isLoading, setIsLoading] = useState(false)
 
@@ -85,7 +86,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         setStep(5) // Move to loading step
         try {
             const recommendation = await generateCareerPath(data)
-            onComplete(recommendation)
+            onComplete(recommendation, data)
         } catch (error) {
             console.error("Failed to generate", error)
             setIsLoading(false)
@@ -160,11 +161,17 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                         </div>
                         <Button
                             size="lg"
-                            className="w-full text-xl h-16 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-blue-500/25"
+                            className="w-full text-xl h-16 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-blue-500/25 mb-4"
                             onClick={handleNext}
                         >
                             Start Journey <ArrowRight className="ml-2 w-6 h-6" />
                         </Button>
+                        <button
+                            onClick={onSkip}
+                            className="w-full py-3 text-slate-500 hover:text-indigo-600 font-bold text-sm transition-colors"
+                        >
+                            Skip for now
+                        </button>
                     </OnboardingStep>
                 )}
 

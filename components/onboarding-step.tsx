@@ -23,8 +23,8 @@ export function OnboardingStep({ children, title, description, isActive }: Onboa
                 damping: 20
             }}
             className={cn(
-                "w-full max-w-2xl mx-auto space-y-8",
-                "p-10 bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-white/40 dark:border-slate-800/40"
+                "w-full max-w-2xl mx-auto space-y-6 sm:space-y-8",
+                "p-6 sm:p-10 bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-white/40 dark:border-slate-800/40"
             )}
         >
             <div className="space-y-3 text-center">
@@ -32,7 +32,7 @@ export function OnboardingStep({ children, title, description, isActive }: Onboa
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="text-4xl font-extrabold tracking-tight bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent"
+                    className="text-2xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent"
                 >
                     {title}
                 </motion.h2>
@@ -41,7 +41,7 @@ export function OnboardingStep({ children, title, description, isActive }: Onboa
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="text-slate-500 dark:text-slate-400 text-lg font-medium leading-relaxed max-w-md mx-auto"
+                        className="text-slate-500 dark:text-slate-400 text-base sm:text-lg font-medium leading-relaxed max-w-md mx-auto"
                     >
                         {description}
                     </motion.p>
