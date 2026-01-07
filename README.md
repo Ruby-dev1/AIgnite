@@ -1,6 +1,6 @@
 # AIgnite - CareerQuest
 
-A futuristic, gamified career exploration platform designed to help users discover their potential, set goals, and navigate their professional journey with the help of AI.
+A AI powered career exploration platform designed to help users discover their potential, set goals, and navigate their professional journey.
 
 ## 🚀 Features
 
@@ -30,8 +30,8 @@ A futuristic, gamified career exploration platform designed to help users discov
 
 1.  **Clone the repository:**
     ```bash
-    git clone <repository-url>
-    cd gamified-career-app
+    git clone https://github.com/Ruby-dev1/AIgnite.git
+    cd AIgnite
     ```
 
 2.  **Install dependencies:**
