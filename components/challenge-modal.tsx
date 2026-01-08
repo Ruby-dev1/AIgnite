@@ -130,7 +130,7 @@ export default function ChallengeModal({ challengeId, onComplete, onClose }: Cha
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in duration-200">
       <div className="bg-card rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
         <div className="sticky top-0 bg-card border-b border-border p-6 flex items-center justify-between">
           <div>
@@ -173,11 +173,10 @@ export default function ChallengeModal({ challengeId, onComplete, onClose }: Cha
                       <button
                         key={idx}
                         onClick={() => handleAnswer(idx)}
-                        className={`w-full p-4 rounded-lg border-2 transition-all text-left font-medium ${
-                          selectedAnswers[currentQuestion] === idx
-                            ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30"
-                            : "border-border hover:border-indigo-300 dark:hover:border-indigo-700"
-                        }`}
+                        className={`w-full p-4 rounded-lg border-2 transition-all text-left font-medium ${selectedAnswers[currentQuestion] === idx
+                            ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 shadow-md ring-2 ring-indigo-500/20"
+                            : "border-border hover:border-indigo-300 dark:hover:border-indigo-700 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                          }`}
                       >
                         {option}
                       </button>
@@ -198,8 +197,8 @@ export default function ChallengeModal({ challengeId, onComplete, onClose }: Cha
             </>
           ) : (
             <div className="text-center py-8">
-              <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-10 h-10 text-white" />
+              <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-500/30 animate-in zoom-in spin-in-12 duration-500">
+                <Zap className="w-12 h-12 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-2">Challenge Completed!</h3>
               <p className="text-muted-foreground mb-4">You earned {isQuiz ? score : challenge.points} points</p>

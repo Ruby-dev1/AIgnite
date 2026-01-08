@@ -2,6 +2,7 @@
 
 export interface UserProfile {
     id: string
+    _id?: string // MongoDB ID
     name: string
     email: string
     bio: string
@@ -16,61 +17,51 @@ export interface UserProfile {
     interests: string[]
     onboardingCompleted: boolean
     primaryCareer?: string
+    fieldXp: Record<string, number>
+    isVerified?: boolean
 }
 
-const STORAGE_KEY = "aignite_users"
 const SESSION_KEY = "aignite_session"
+const TOKEN_KEY = "aignite_token"
 
 export const AuthService = {
-    getUsers: (): UserProfile[] => {
-        if (typeof window === "undefined") return []
-        const data = localStorage.getItem(STORAGE_KEY)
-        return data ? JSON.parse(data) : []
-    },
-
-    saveUsers: (users: UserProfile[]) => {
-        if (typeof window === "undefined") return
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(users))
-    },
-
-    signup: (name: string, email: string, bio: string, role: string): UserProfile | null => {
-        const users = AuthService.getUsers()
-        if (users.find(u => u.email === email)) return null
-
-        const newUser: UserProfile = {
-            id: Math.random().toString(36).substr(2, 9),
-            name,
-            email,
-            bio: bio || "Self-driven learner exploring the future of work.",
-            role: role || "High School Senior",
-            level: 1,
-            xp: 0,
-            maxXp: 1000,
-            badges: 0,
-            completedChallenges: 0,
-            skills: [],
-            interests: [],
-            onboardingCompleted: false
+    signup: async (name: string, email: string, password: string, bio: string, role: string): Promise<{ message?: string; error?: string }> => {
+        try {
+            const response = await fetch("/api/auth/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email, password, bio, role }),
+            })
+            const data = await response.json()
+            return data
+        } catch (error) {
+            return { error: "Failed to sign up. Please try again." }
         }
-
-        AuthService.saveUsers([...users, newUser])
-        AuthService.setSession(newUser)
-        return newUser
     },
 
-    login: (email: string): UserProfile | null => {
-        const users = AuthService.getUsers()
-        const user = users.find(u => u.email === email)
-        if (user) {
-            AuthService.setSession(user)
-            return user
+    login: async (email: string, password: string): Promise<{ user?: UserProfile; token?: string; error?: string }> => {
+        try {
+            const response = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            })
+            const data = await response.json()
+            if (response.ok && data.user && data.token) {
+                AuthService.setSession(data.user, data.token)
+            }
+            return data
+        } catch (error) {
+            return { error: "Failed to login. Please try again." }
         }
-        return null
     },
 
-    setSession: (user: UserProfile) => {
+    setSession: (user: UserProfile, token?: string) => {
         if (typeof window === "undefined") return
         localStorage.setItem(SESSION_KEY, JSON.stringify(user))
+        if (token) {
+            localStorage.setItem(TOKEN_KEY, token)
+        }
     },
 
     getSession: (): UserProfile | null => {
@@ -79,21 +70,50 @@ export const AuthService = {
         return data ? JSON.parse(data) : null
     },
 
+    getToken: (): string | null => {
+        if (typeof window === "undefined") return null
+        return localStorage.getItem(TOKEN_KEY)
+    },
+
     logout: () => {
         if (typeof window === "undefined") return
         localStorage.removeItem(SESSION_KEY)
+        localStorage.removeItem(TOKEN_KEY)
     },
 
-    updateProfile: (updatedData: Partial<UserProfile>): UserProfile | null => {
+    updateProfile: async (updatedData: Partial<UserProfile>): Promise<UserProfile | null> => {
         const session = AuthService.getSession()
         if (!session) return null
 
-        const updatedUser = { ...session, ...updatedData }
+        let updatedUser = {
+            ...session,
+            ...updatedData,
+            fieldXp: updatedData.fieldXp ? { ...session.fieldXp, ...updatedData.fieldXp } : session.fieldXp
+        }
+
+        // Level Up Logic
+        while (updatedUser.xp >= updatedUser.maxXp) {
+            updatedUser.xp -= updatedUser.maxXp
+            updatedUser.level += 1
+            updatedUser.maxXp = Math.floor(updatedUser.maxXp * 1.2)
+        }
+
+        // Note: For now, we still save profile updates to local session. 
+        // In a full implementation, you'd have an API route to update the MongoDB user too.
         AuthService.setSession(updatedUser)
 
-        const users = AuthService.getUsers()
-        const updatedUsers = users.map(u => u.id === session.id ? updatedUser : u)
-        AuthService.saveUsers(updatedUsers)
+        // TODO: Implement API route for profile updates to persist in MongoDB
+        /*
+        const token = AuthService.getToken();
+        await fetch("/api/user/update", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(updatedUser),
+        });
+        */
 
         return updatedUser
     }

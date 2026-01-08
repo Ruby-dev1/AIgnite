@@ -105,11 +105,22 @@ export default function CareerExplorer() {
 
   const handleCompleteChallenge = (challengeId: number) => {
     const challengeXP = 150 // Fallback or find in data
-    if (user) {
+
+    // Find which career this challenge belongs to
+    const career = careers.find(c => c.challenges.some(ch => ch.id === challengeId))
+
+    if (user && career) {
+      const currentFieldXP = user.fieldXp?.[career.id] || 0
+
       AuthService.updateProfile({
         xp: user.xp + challengeXP,
-        completedChallenges: user.completedChallenges + 1
+        completedChallenges: user.completedChallenges + 1,
+        fieldXp: {
+          ...user.fieldXp,
+          [career.id]: currentFieldXP + challengeXP
+        }
       })
+
       const updated = AuthService.getSession()
       if (updated) setUser(updated)
     }

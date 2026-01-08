@@ -172,7 +172,7 @@ export default function ProfileSection({ onLogout }: ProfileSectionProps) {
                             <div className="mt-6">
                                 <div className="flex justify-between items-end mb-2">
                                     <span className="text-xs font-black uppercase tracking-widest text-slate-400">Experience Points</span>
-                                    <span className="text-xs font-black text-indigo-600">{userData.xp} / {userData.maxXp} XP</span>
+                                    <span className="text-sm font-black text-indigo-600">{userData.xp} / {userData.maxXp} XP</span>
                                 </div>
                                 <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                     <motion.div

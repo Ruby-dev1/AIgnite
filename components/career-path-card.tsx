@@ -134,6 +134,7 @@ export default function CareerPathCard({
                         onClick={(e) => {
                           e.stopPropagation();
                           onChallengeSelect(challenge.id);
+                          setExpanded(false);
                         }}
                         className={cn(
                           "w-full text-left p-5 rounded-3xl transition-all border group/quest",

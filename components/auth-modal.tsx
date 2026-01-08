@@ -2,9 +2,10 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, Mail, Lock, User, Github, Chrome, ChevronDown } from "lucide-react"
+import { X, Mail, Lock, User, Github, Chrome, ChevronDown, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AuthService, type UserProfile } from "@/lib/auth-service"
+import { toast } from "sonner"
 
 interface AuthModalProps {
     isOpen: boolean
@@ -19,28 +20,38 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     const [name, setName] = useState("")
     const [role, setRole] = useState("High School Senior")
     const [bio, setBio] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState("")
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError("")
+        setIsLoading(true)
 
-        if (mode === "signup") {
-            const user = AuthService.signup(name, email, bio, role)
-            if (user) {
-                onSuccess(user)
-                onClose()
+        try {
+            if (mode === "signup") {
+                const result = await AuthService.signup(name, email, password, bio, role)
+                if (result.error) {
+                    setError(result.error)
+                } else {
+                    toast.success("Verification email sent!", {
+                        description: "Please check your inbox to verify your account.",
+                    })
+                    setMode("login")
+                }
             } else {
-                setError("An account with this email already exists.")
+                const result = await AuthService.login(email, password)
+                if (result.error) {
+                    setError(result.error)
+                } else if (result.user) {
+                    onSuccess(result.user)
+                    onClose()
+                }
             }
-        } else {
-            const user = AuthService.login(email)
-            if (user) {
-                onSuccess(user)
-                onClose()
-            } else {
-                setError("Account not found. Please sign up first.")
-            }
+        } catch (err) {
+            setError("Something went wrong. Please try again.")
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -151,9 +162,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
                                 <Button
                                     type="submit"
-                                    className="w-full py-7 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 font-black text-lg shadow-xl shadow-indigo-500/20 transition-all"
+                                    disabled={isLoading}
+                                    className="w-full py-7 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 font-black text-lg shadow-xl shadow-indigo-500/20 transition-all flex items-center justify-center gap-2"
                                 >
-                                    {mode === "login" ? "Sign In" : "Sign Up"}
+                                    {isLoading ? (
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                    ) : (
+                                        mode === "login" ? "Sign In" : "Sign Up"
+                                    )}
                                 </Button>
                             </form>
 

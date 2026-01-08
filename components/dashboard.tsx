@@ -50,15 +50,19 @@ export default function Dashboard({ recommendation, onboardingSkipped, onStartOn
 
   // Dynamic progression based on activity
   const careerProgress = [
-    { name: "IT & Technology", progress: user.primaryCareer?.toLowerCase().includes("tech") ? 45 : 10 },
-    { name: "Health Sciences", progress: user.primaryCareer?.toLowerCase().includes("health") ? 45 : 5 },
-    { name: "Business", progress: user.primaryCareer?.toLowerCase().includes("business") ? 45 : 15 },
-    { name: "Fashion & Design", progress: user.primaryCareer?.toLowerCase().includes("fashion") ? 45 : 8 },
-    { name: "Arts & Creative", progress: user.primaryCareer?.toLowerCase().includes("arts") ? 45 : 12 },
-  ].map(p => ({
-    ...p,
-    progress: Math.min(100, p.progress + (user.completedChallenges * 5))
-  }))
+    { id: "it", name: "IT & Technology" },
+    { id: "health", name: "Health Sciences" },
+    { id: "business", name: "Business" },
+    { id: "fashion", name: "Fashion & Design" },
+    { id: "arts", name: "Arts & Creative" },
+  ].map(p => {
+    // specific field XP or 0. Goal is 1000 XP per field.
+    const fieldXP = user.fieldXp?.[p.id] || 0
+    return {
+      name: p.name,
+      progress: Math.min(100, (fieldXP / 1000) * 100)
+    }
+  })
 
   const allPossibleBadges = [
     { id: 1, name: "Code Master", icon: "⚡" },
