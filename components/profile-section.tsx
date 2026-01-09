@@ -81,17 +81,11 @@ export default function ProfileSection({ onLogout }: ProfileSectionProps) {
                         {!isEditing && (
                             <button
                                 onClick={() => setIsEditing(true)}
-                                className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-indigo-600 transition-all opacity-0 group-hover:opacity-100 shadow-sm"
+                                className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-indigo-600 transition-all shadow-sm"
                             >
                                 <Edit2 className="w-5 h-5" />
                             </button>
                         )}
-                        <button
-                            onClick={onLogout}
-                            className="p-3 rounded-2xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition-all opacity-0 group-hover:opacity-100 shadow-sm"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
                     </div>
 
                     <div className="flex flex-col md:flex-row items-center gap-8">
