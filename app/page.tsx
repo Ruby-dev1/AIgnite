@@ -9,6 +9,7 @@ import AIChat from "@/components/ai-chat"
 import ProfileSection from "@/components/profile-section"
 import AuthModal from "@/components/auth-modal"
 import ChallengesSection from "@/components/challenges-section"
+import LeaderboardSection from "@/components/leaderboard-section"
 import { type CareerRecommendation } from "@/lib/ai-career-service"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, Sparkles, Zap } from "lucide-react"
@@ -18,7 +19,7 @@ import { useEffect } from "react"
 import { AuthService, type UserProfile } from "@/lib/auth-service"
 
 export default function Home() {
-  const [currentPage, setCurrentPage] = useState<"dashboard" | "explore" | "challenges" | "profile">("dashboard")
+  const [currentPage, setCurrentPage] = useState<"dashboard" | "explore" | "challenges" | "leaderboard" | "profile">("dashboard")
   const [showOnboarding, setShowOnboarding] = useState(true)
   const [recommendation, setRecommendation] = useState<CareerRecommendation | null>(null)
   const [isAIChatOpen, setIsAIChatOpen] = useState(false)
@@ -169,6 +170,7 @@ export default function Home() {
                   )}
                   {currentPage === "explore" && <CareerExplorer />}
                   {currentPage === "challenges" && <ChallengesSection />}
+                  {currentPage === "leaderboard" && <LeaderboardSection />}
                   {currentPage === "profile" && (
                     <ProfileSection onLogout={handleLogout} />
                   )}

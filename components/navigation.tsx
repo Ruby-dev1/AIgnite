@@ -1,14 +1,14 @@
 "use client"
 
-import { Zap, Compass, Target, User, Menu, X, MessageSquare } from "lucide-react"
+import { Zap, Compass, Target, User, Menu, X, MessageSquare, Trophy } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { type UserProfile } from "@/lib/auth-service"
 
 interface NavigationProps {
-  currentPage: "dashboard" | "explore" | "challenges" | "profile"
-  setCurrentPage: (page: "dashboard" | "explore" | "challenges" | "profile") => void
+  currentPage: "dashboard" | "explore" | "challenges" | "leaderboard" | "profile"
+  setCurrentPage: (page: "dashboard" | "explore" | "challenges" | "leaderboard" | "profile") => void
   onOpenAIChat: () => void
   isAuthenticated?: boolean
   onLoginClick?: () => void
@@ -19,6 +19,7 @@ const navItems = [
   { id: "dashboard", label: "Dashboard", icon: Zap, color: "bg-indigo-500" },
   { id: "explore", label: "Explore", icon: Compass, color: "bg-pink-500" },
   { id: "challenges", label: "Challenges", icon: Target, color: "bg-amber-500" },
+  { id: "leaderboard", label: "Leaderboard", icon: Trophy, color: "bg-slate-500" },
 ] as const
 
 export default function Navigation({
