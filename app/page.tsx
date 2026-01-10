@@ -51,8 +51,9 @@ export default function Home() {
         onboardingCompleted: true,
         skills: onboardingData.skills,
         interests: onboardingData.interests,
+        academics: onboardingData.academics,
+        ecas: onboardingData.ecas,
         primaryCareer: rec.careerPath,
-        // We could also map other fields if needed
       })
     }
   }

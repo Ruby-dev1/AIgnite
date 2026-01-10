@@ -15,6 +15,11 @@ export interface UserProfile {
     completedChallenges: number
     skills: string[]
     interests: string[]
+    academics?: {
+        gpa: string;
+        favoriteSubjects: string[];
+    }
+    ecas?: string[]
     onboardingCompleted: boolean
     primaryCareer?: string
     fieldXp: Record<string, number>
@@ -36,6 +41,34 @@ export const AuthService = {
             return data
         } catch (error) {
             return { error: "Failed to sign up. Please try again." }
+        }
+    },
+
+    forgotPassword: async (email: string): Promise<{ message?: string; error?: string }> => {
+        try {
+            const response = await fetch("/api/auth/forgot-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email }),
+            })
+            const data = await response.json()
+            return data
+        } catch (error) {
+            return { error: "Failed to send reset email. Please try again." }
+        }
+    },
+
+    resetPassword: async (token: string, email: string, password: string): Promise<{ message?: string; error?: string }> => {
+        try {
+            const response = await fetch("/api/auth/reset-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token, email, password }),
+            })
+            const data = await response.json()
+            return data
+        } catch (error) {
+            return { error: "Failed to reset password. Please try again." }
         }
     },
 
@@ -98,22 +131,24 @@ export const AuthService = {
             updatedUser.maxXp = Math.floor(updatedUser.maxXp * 1.2)
         }
 
-        // Note: For now, we still save profile updates to local session. 
-        // In a full implementation, you'd have an API route to update the MongoDB user too.
-        AuthService.setSession(updatedUser)
-
-        // TODO: Implement API route for profile updates to persist in MongoDB
-        /*
+        // Sync with MongoDB
         const token = AuthService.getToken();
-        await fetch("/api/user/update", {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(updatedUser),
-        });
-        */
+        if (token) {
+            try {
+                await fetch("/api/user/update", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(updatedUser),
+                });
+            } catch (error) {
+                console.error("Failed to sync progress with database:", error);
+            }
+        }
+
+        AuthService.setSession(updatedUser)
 
         return updatedUser
     }

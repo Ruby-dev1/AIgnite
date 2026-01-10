@@ -14,7 +14,7 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
-    const [mode, setMode] = useState<"login" | "signup">("login")
+    const [mode, setMode] = useState<"login" | "signup" | "forgot">("login")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [name, setName] = useState("")
@@ -39,6 +39,16 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                     })
                     setMode("login")
                 }
+            } else if (mode === "forgot") {
+                const result = await AuthService.forgotPassword(email)
+                if (result.error) {
+                    setError(result.error)
+                } else {
+                    toast.success("Reset link sent!", {
+                        description: "If an account exists, you will receive an email shortly.",
+                    })
+                    setMode("login")
+                }
             } else {
                 const result = await AuthService.login(email, password)
                 if (result.error) {
@@ -53,6 +63,18 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         } finally {
             setIsLoading(false)
         }
+    }
+
+    const getTitle = () => {
+        if (mode === "login") return "Welcome back"
+        if (mode === "signup") return "Create Account"
+        return "Reset Password"
+    }
+
+    const getSubtitle = () => {
+        if (mode === "login") return "Ready to continue your journey?"
+        if (mode === "signup") return "Start your professional adventure today."
+        return "Enter your email to receive a reset link."
     }
 
     return (
@@ -82,10 +104,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
                             <div className="text-center mb-8">
                                 <h2 className="text-3xl font-black mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                                    {mode === "login" ? "Welcome back" : "Create Account"}
+                                    {getTitle()}
                                 </h2>
                                 <p className="text-slate-500 dark:text-slate-400 font-medium">
-                                    {mode === "login" ? "Ready to continue your journey?" : "Start your professional adventure today."}
+                                    {getSubtitle()}
                                 </p>
                             </div>
 
@@ -148,17 +170,31 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                                         className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl py-4 pl-12 pr-4 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
                                     />
                                 </div>
-                                <div className="relative">
-                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                                    <input
-                                        required
-                                        type="password"
-                                        placeholder="Password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl py-4 pl-12 pr-4 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
-                                    />
-                                </div>
+                                {mode !== "forgot" && (
+                                    <div className="relative">
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                        <input
+                                            required
+                                            type="password"
+                                            placeholder="Password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl py-4 pl-12 pr-4 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
+                                        />
+                                    </div>
+                                )}
+
+                                {mode === "login" && (
+                                    <div className="flex justify-end">
+                                        <button
+                                            type="button"
+                                            onClick={() => setMode("forgot")}
+                                            className="text-xs font-bold text-slate-500 hover:text-indigo-600 transition-colors"
+                                        >
+                                            Forgot password?
+                                        </button>
+                                    </div>
+                                )}
 
                                 <Button
                                     type="submit"
@@ -168,7 +204,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                                     {isLoading ? (
                                         <Loader2 className="w-5 h-5 animate-spin" />
                                     ) : (
-                                        mode === "login" ? "Sign In" : "Sign Up"
+                                        mode === "login" ? "Sign In" : mode === "signup" ? "Sign Up" : "Send Reset Link"
                                     )}
                                 </Button>
                             </form>
@@ -190,13 +226,27 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                                 </div>
                             </div>
 
-                            <div className="mt-8 text-center">
-                                <button
-                                    onClick={() => setMode(mode === "login" ? "signup" : "login")}
-                                    className="text-sm font-bold text-indigo-600 hover:text-indigo-500 transition-colors"
-                                >
-                                    {mode === "login" ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-                                </button>
+                            <div className="mt-8 text-center space-y-2">
+                                {mode !== "signup" && (
+                                    <div>
+                                        <button
+                                            onClick={() => setMode("signup")}
+                                            className="text-sm font-bold text-indigo-600 hover:text-indigo-500 transition-colors"
+                                        >
+                                            Don't have an account? Sign up
+                                        </button>
+                                    </div>
+                                )}
+                                {mode !== "login" && (
+                                    <div>
+                                        <button
+                                            onClick={() => setMode("login")}
+                                            className="text-sm font-bold text-indigo-600 hover:text-indigo-500 transition-colors"
+                                        >
+                                            Already have an account? Sign in
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </motion.div>

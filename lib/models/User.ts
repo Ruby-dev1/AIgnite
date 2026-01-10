@@ -14,6 +14,11 @@ const UserSchema = new Schema({
     completedChallenges: { type: Number, default: 0 },
     skills: { type: [String], default: [] },
     interests: { type: [String], default: [] },
+    academics: {
+        gpa: { type: String },
+        favoriteSubjects: { type: [String], default: [] }
+    },
+    ecas: { type: [String], default: [] },
     onboardingCompleted: { type: Boolean, default: false },
     primaryCareer: { type: String },
     fieldXp: {
@@ -29,6 +34,8 @@ const UserSchema = new Schema({
     },
     isVerified: { type: Boolean, default: false },
     verificationToken: { type: String },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
 }, { timestamps: true });
 
 const User = models.User || model("User", UserSchema);

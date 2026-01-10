@@ -4,6 +4,7 @@ import { User, Mail, GraduationCap, Briefcase, Award, Sparkles, ChevronRight, Ed
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import { Spinner } from "@/components/ui/spinner"
 import { AuthService, type UserProfile } from "@/lib/auth-service"
 import { cn } from "@/lib/utils"
 
@@ -29,6 +30,10 @@ interface ProfileSectionProps {
 export default function ProfileSection({ onLogout }: ProfileSectionProps) {
     const [isEditing, setIsEditing] = useState(false)
     const [userData, setUserData] = useState<UserProfile | null>(null)
+    const [isUploading, setIsUploading] = useState(false)
+    const [uploadError, setUploadError] = useState<string | null>(null)
+    const [uploadProgress, setUploadProgress] = useState<number>(0)
+    const [lastFile, setLastFile] = useState<File | null>(null)
 
     useEffect(() => {
         const session = AuthService.getSession()
@@ -49,18 +54,76 @@ export default function ProfileSection({ onLogout }: ProfileSectionProps) {
         setIsEditing(false)
     }
 
+    const uploadFile = (file: File) => {
+        if (!userData) return
+        setUploadError(null)
+        setIsUploading(true)
+        setUploadProgress(0)
+
+        const form = new FormData()
+        form.append("file", file)
+
+        const token = AuthService.getToken()
+        const xhr = new XMLHttpRequest()
+        xhr.open("POST", "/api/upload/avatar", true)
+        if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`)
+
+        xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+                const percent = Math.round((event.loaded / event.total) * 100)
+                setUploadProgress(percent)
+            }
+        }
+
+        xhr.onload = () => {
+            setIsUploading(false)
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    const data = JSON.parse(xhr.responseText)
+                    if (data.user) {
+                        AuthService.setSession(data.user, token || undefined)
+                        setUserData(data.user)
+                        setLastFile(null)
+                        setUploadProgress(100)
+                    } else {
+                        const errMsg = data?.error || "Upload failed"
+                        setUploadError(errMsg)
+                    }
+                } catch (err) {
+                    setUploadError("Unexpected server response")
+                }
+            } else {
+                try {
+                    const data = JSON.parse(xhr.responseText)
+                    setUploadError(data?.error || "Upload failed")
+                } catch (err) {
+                    setUploadError("Upload failed")
+                }
+            }
+        }
+
+        xhr.onerror = () => {
+            setIsUploading(false)
+            setUploadError("Network error during upload")
+        }
+
+        xhr.send(form)
+    }
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
-        if (file && userData) {
-            const reader = new FileReader()
-            reader.onloadend = () => {
-                const base64String = reader.result as string
-                const updated = { ...userData, avatar: base64String }
-                setUserData(updated)
-                AuthService.updateProfile({ avatar: base64String })
-            }
-            reader.readAsDataURL(file)
-        }
+        if (!file || !userData) return
+        setLastFile(file)
+
+        // preview locally
+        const url = URL.createObjectURL(file)
+        setUserData({ ...userData, avatar: url })
+
+        uploadFile(file)
+    }
+
+    const handleRetry = () => {
+        if (lastFile) uploadFile(lastFile)
     }
 
     if (!userData) return null
@@ -99,6 +162,7 @@ export default function ProfileSection({ onLogout }: ProfileSectionProps) {
                                     className="hidden"
                                     accept="image/*"
                                     onChange={handleFileChange}
+                                    disabled={isUploading}
                                 />
                                 {userData.avatar ? (
                                     <img
@@ -113,9 +177,22 @@ export default function ProfileSection({ onLogout }: ProfileSectionProps) {
                                 )}
 
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-opacity">
-                                    <Camera className="w-8 h-8 text-white" />
+                                    {isUploading ? (
+                                        <div className="flex flex-col items-center gap-2">
+                                            <Spinner className="w-8 h-8 text-white" />
+                                            <div className="text-xs text-white">{uploadProgress}%</div>
+                                        </div>
+                                    ) : (
+                                        <Camera className="w-8 h-8 text-white" />
+                                    )}
                                 </div>
                             </label>
+                            {uploadError && (
+                                <div className="mt-2 text-xs text-red-600 font-medium flex items-center gap-2">
+                                    <span>{uploadError}</span>
+                                    <button onClick={handleRetry} className="underline text-xs">Retry</button>
+                                </div>
+                            )}
                             <div className="absolute -bottom-2 -right-2 bg-amber-500 text-white text-xs font-black px-3 py-1.5 rounded-xl shadow-lg border-2 border-white dark:border-slate-900">
                                 LVL {userData.level}
                             </div>
