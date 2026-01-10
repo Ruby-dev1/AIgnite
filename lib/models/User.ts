@@ -12,6 +12,7 @@ const UserSchema = new Schema({
     maxXp: { type: Number, default: 1000 },
     badges: { type: Number, default: 0 },
     completedChallenges: { type: Number, default: 0 },
+    completedChallengeIds: { type: [Number], default: [] },
     skills: { type: [String], default: [] },
     interests: { type: [String], default: [] },
     academics: {

@@ -5,6 +5,7 @@ import CareerPathCard from "./career-path-card"
 import ChallengeModal from "./challenge-modal"
 import { Code2, Stethoscope, Briefcase, Palette, Brush, Sparkles, Compass } from "lucide-react"
 import { AuthService, type UserProfile } from "@/lib/auth-service"
+import { motion } from "framer-motion"
 
 const careers = [
   {
@@ -104,20 +105,30 @@ export default function CareerExplorer() {
   }, [])
 
   const handleCompleteChallenge = (challengeId: number) => {
-    const challengeXP = 150 // Fallback or find in data
+    if (!user) return
+
+    // Check if challenge is already completed
+    if (user.completedChallengeIds?.includes(challengeId)) {
+      console.log("Challenge already completed")
+      setSelectedChallenge(null)
+      return
+    }
 
     // Find which career this challenge belongs to
     const career = careers.find(c => c.challenges.some(ch => ch.id === challengeId))
+    const challenge = career?.challenges.find(ch => ch.id === challengeId)
 
-    if (user && career) {
+    if (career && challenge) {
       const currentFieldXP = user.fieldXp?.[career.id] || 0
+      const newCompletedIds = [...(user.completedChallengeIds || []), challengeId]
 
       AuthService.updateProfile({
-        xp: user.xp + challengeXP,
+        xp: user.xp + challenge.points,
         completedChallenges: user.completedChallenges + 1,
+        completedChallengeIds: newCompletedIds,
         fieldXp: {
           ...user.fieldXp,
-          [career.id]: currentFieldXP + challengeXP
+          [career.id]: currentFieldXP + challenge.points
         }
       })
 
@@ -134,30 +145,48 @@ export default function CareerExplorer() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="mb-12 space-y-4">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-black uppercase tracking-widest">
-          <Compass className="w-3 h-3" />
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mb-16 space-y-6"
+      >
+        <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-black uppercase tracking-[0.2em] border border-indigo-200 dark:border-indigo-800/50">
+          <Compass className="w-4 h-4" />
           Vocation Discovery
         </div>
-        <h2 className="text-5xl font-black text-slate-900 dark:text-white tracking-tight">Explore the <span className="text-indigo-600">Futures</span> 🚀</h2>
-        <p className="text-slate-500 dark:text-slate-400 font-medium text-lg max-w-2xl">
+        <h2 className="text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+          Explore the <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Futures</span> 🚀
+        </h2>
+        <p className="text-slate-500 dark:text-slate-400 font-medium text-xl max-w-3xl leading-relaxed">
           Dive into specialized career tracks, master industry-standard tools, and build a portfolio that stands out.
         </p>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-        {careers.map((career) => (
-          <CareerPathCard
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8"
+      >
+        {careers.map((career, index) => (
+          <motion.div
             key={career.id}
-            career={career}
-            onChallengeSelect={setSelectedChallenge}
-            completedChallenges={user?.completedChallenges ? [] : []} // Needs better tracking but focusing on UI
-            onSelectPrimary={handleSelectPrimary}
-            isPrimary={user?.primaryCareer === career.id}
-          />
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 * index }}
+          >
+            <CareerPathCard
+              career={career}
+              onChallengeSelect={setSelectedChallenge}
+              completedChallenges={user?.completedChallengeIds || []}
+              onSelectPrimary={handleSelectPrimary}
+              isPrimary={user?.primaryCareer === career.id}
+            />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {selectedChallenge !== null && (
         <ChallengeModal
@@ -165,6 +194,7 @@ export default function CareerExplorer() {
           careers={careers}
           onComplete={handleCompleteChallenge}
           onClose={() => setSelectedChallenge(null)}
+          isCompleted={user?.completedChallengeIds?.includes(selectedChallenge) || false}
         />
       )}
     </div>

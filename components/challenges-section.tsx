@@ -58,11 +58,23 @@ export default function ChallengesSection() {
     )
 
     const handleChallengeComplete = (challengeId: number) => {
+        if (!user) return
+
+        // Check if challenge is already completed
+        if (user.completedChallengeIds?.includes(challengeId)) {
+            console.log("Challenge already completed")
+            setSelectedChallenge(null)
+            return
+        }
+
         const challenge = allChallenges.find(c => c.id === challengeId)
-        if (challenge && user) {
+        if (challenge) {
+            const newCompletedIds = [...(user.completedChallengeIds || []), challengeId]
+
             AuthService.updateProfile({
                 xp: user.xp + challenge.points,
-                completedChallenges: user.completedChallenges + 1
+                completedChallenges: user.completedChallenges + 1,
+                completedChallengeIds: newCompletedIds
             })
             // Reload user state
             const updated = AuthService.getSession()
@@ -201,6 +213,7 @@ export default function ChallengesSection() {
                     careers={[]}
                     onComplete={handleChallengeComplete}
                     onClose={() => setSelectedChallenge(null)}
+                    isCompleted={user?.completedChallengeIds?.includes(selectedChallenge) || false}
                 />
             )}
         </div>

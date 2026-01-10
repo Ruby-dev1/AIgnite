@@ -13,6 +13,7 @@ export interface UserProfile {
     maxXp: number
     badges: number
     completedChallenges: number
+    completedChallengeIds: number[]
     skills: string[]
     interests: string[]
     academics?: {
@@ -124,11 +125,14 @@ export const AuthService = {
             fieldXp: updatedData.fieldXp ? { ...session.fieldXp, ...updatedData.fieldXp } : session.fieldXp
         }
 
-        // Level Up Logic
+        // Level Up Logic - Exponential XP Progression
+        // Formula: maxXp = (previous maxXp × 2) + 100
+        // Progression: 1000 → 2100 → 4300 → 8700 → 17500...
+
         while (updatedUser.xp >= updatedUser.maxXp) {
-            updatedUser.xp -= updatedUser.maxXp
             updatedUser.level += 1
-            updatedUser.maxXp = Math.floor(updatedUser.maxXp * 1.2)
+            // New maxXp = (previous maxXp × 2) + 100
+            updatedUser.maxXp = (updatedUser.maxXp * 2) + 100
         }
 
         // Sync with MongoDB
