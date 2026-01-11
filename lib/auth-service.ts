@@ -29,6 +29,7 @@ export interface UserProfile {
 
 const SESSION_KEY = "aignite_session"
 const TOKEN_KEY = "aignite_token"
+export const SESSION_UPDATED_EVENT = "aignite_session_updated"
 
 export const AuthService = {
     signup: async (name: string, email: string, password: string, bio: string, role: string): Promise<{ message?: string; error?: string }> => {
@@ -96,6 +97,7 @@ export const AuthService = {
         if (token) {
             localStorage.setItem(TOKEN_KEY, token)
         }
+        window.dispatchEvent(new CustomEvent(SESSION_UPDATED_EVENT, { detail: user }))
     },
 
     getSession: (): UserProfile | null => {
@@ -113,6 +115,7 @@ export const AuthService = {
         if (typeof window === "undefined") return
         localStorage.removeItem(SESSION_KEY)
         localStorage.removeItem(TOKEN_KEY)
+        window.dispatchEvent(new CustomEvent(SESSION_UPDATED_EVENT, { detail: null }))
     },
 
     updateProfile: async (updatedData: Partial<UserProfile>): Promise<UserProfile | null> => {

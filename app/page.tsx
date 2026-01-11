@@ -16,7 +16,7 @@ import { X, Sparkles, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 import { useEffect } from "react"
-import { AuthService, type UserProfile } from "@/lib/auth-service"
+import { AuthService, type UserProfile, SESSION_UPDATED_EVENT } from "@/lib/auth-service"
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState<"dashboard" | "explore" | "challenges" | "leaderboard" | "profile">("dashboard")
@@ -40,6 +40,19 @@ export default function Home() {
         setShowOnboarding(false)
       }
     }
+
+    const handleUpdate = (e: any) => {
+      if (e.detail) {
+        setUser(e.detail)
+        setIsAuthenticated(true)
+      } else {
+        setUser(null)
+        setIsAuthenticated(false)
+      }
+    }
+
+    window.addEventListener(SESSION_UPDATED_EVENT, handleUpdate)
+    return () => window.removeEventListener(SESSION_UPDATED_EVENT, handleUpdate)
   }, [])
 
   const handleOnboardingComplete = (rec: CareerRecommendation, onboardingData: any) => {

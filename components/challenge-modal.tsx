@@ -11,95 +11,10 @@ interface ChallengeModalProps {
   isCompleted?: boolean
 }
 
-const challengeData: Record<number, any> = {
-  1: {
-    title: "Build Your First Website",
-    type: "simulation",
-    points: 100,
-    description: "Create a simple portfolio website using HTML and CSS",
-    questions: [
-      {
-        q: "What is HTML primarily used for?",
-        options: ["Styling", "Structure & Content", "Animations", "Databases"],
-        correct: 1,
-      },
-      {
-        q: "Which tag defines a paragraph?",
-        options: ["<para>", "<p>", "<paragraph>", "<text>"],
-        correct: 1,
-      },
-      {
-        q: "What does CSS stand for?",
-        options: ["Computer Style Sheet", "Cascading Style Sheet", "Creative Style System", "Code Style Service"],
-        correct: 1,
-      },
-    ],
-  },
-  2: {
-    title: "Debug a Real App",
-    type: "practical",
-    points: 150,
-    description: "Fix bugs in a real application and learn debugging techniques",
-    scenario: "A user registration form is not working. Find and fix 3 bugs in the code.",
-  },
-  3: {
-    title: "Create an API",
-    type: "project",
-    points: 200,
-    description: "Build a REST API that manages a list of tasks",
-  },
-  4: {
-    title: "Patient Case Study",
-    type: "simulation",
-    points: 100,
-    description: "Analyze a patient case and recommend treatment",
-    scenario: "Patient presents with symptoms. What diagnosis would you suggest?",
-  },
-  5: {
-    title: "Medical Quiz Challenge",
-    type: "quiz",
-    points: 120,
-    description: "Test your medical knowledge",
-    questions: [
-      {
-        q: "What is the normal human body temperature?",
-        options: ["36.5°C", "37.5°C", "38.5°C", "35.5°C"],
-        correct: 0,
-      },
-      {
-        q: "How many bones are in an adult human body?",
-        options: ["186", "206", "216", "196"],
-        correct: 1,
-      },
-      {
-        q: "What is the largest organ in the human body?",
-        options: ["Heart", "Brain", "Skin", "Liver"],
-        correct: 2,
-      },
-    ],
-  },
-  7: {
-    title: "Startup Pitch Challenge",
-    type: "simulation",
-    points: 150,
-    description: "Create and pitch a business idea to investors",
-  },
-  10: {
-    title: "Design Your Collection",
-    type: "project",
-    points: 130,
-    description: "Design a 5-piece fashion collection",
-  },
-  13: {
-    title: "Create an Artwork",
-    type: "project",
-    points: 140,
-    description: "Create digital art inspired by a theme",
-  },
-}
+import { ALL_CHALLENGES, type Challenge } from "@/lib/challenges-data"
 
 export default function ChallengeModal({ challengeId, onComplete, onClose, isCompleted = false }: ChallengeModalProps) {
-  const challenge = challengeData[challengeId] || { title: "Unknown Challenge", points: 0 }
+  const challenge = ALL_CHALLENGES.find(c => c.id === challengeId) || { title: "Unknown Challenge", points: 0, description: "", questions: [] } as any
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [score, setScore] = useState(0)
   const [completed, setCompleted] = useState(false)

@@ -2,31 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Target, Zap, Clock, Trophy, ChevronRight, Star, Filter } from "lucide-react"
+import { Target, Clock, Trophy, ChevronRight, Star, Filter, CircleCheckBig } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import ChallengeModal from "./challenge-modal"
-import { AuthService, type UserProfile } from "@/lib/auth-service"
+import { AuthService, type UserProfile, SESSION_UPDATED_EVENT } from "@/lib/auth-service"
 import { cn } from "@/lib/utils"
 
 const categories = ["All", "Tech", "Health", "Business", "Design", "Arts"]
 
-const allChallenges = [
-    { id: 1, title: "Build Your First Website", points: 100, type: "simulation", difficulty: "Beginner", category: "Tech", description: "Create a simple portfolio website using HTML and CSS" },
-    { id: 2, title: "Debug a Real App", points: 150, type: "practical", difficulty: "Intermediate", category: "Tech", description: "Fix bugs in a real application and learn debugging techniques" },
-    { id: 3, title: "Create an API", points: 200, type: "project", difficulty: "Advanced", category: "Tech", description: "Build a REST API that manages a list of tasks" },
-    { id: 4, title: "Patient Case Study", points: 100, type: "simulation", difficulty: "Beginner", category: "Health", description: "Analyze a patient case and recommend treatment" },
-    { id: 5, title: "Medical Quiz Challenge", points: 120, type: "quiz", difficulty: "Beginner", category: "Health", description: "Test your medical knowledge with a quick quiz" },
-    { id: 6, title: "Health Campaign Design", points: 150, type: "project", difficulty: "Intermediate", category: "Health", description: "Design a community health awareness campaign" },
-    { id: 7, title: "Startup Pitch Challenge", points: 150, type: "simulation", difficulty: "Intermediate", category: "Business", description: "Create and pitch a business idea to investors" },
-    { id: 8, title: "Market Analysis", points: 120, type: "practical", difficulty: "Beginner", category: "Business", description: "Analyze market trends for a new product" },
-    { id: 10, title: "Design Your Collection", points: 130, type: "project", difficulty: "Intermediate", category: "Design", description: "Design a 5-piece fashion collection" },
-    { id: 13, title: "Create an Artwork", points: 140, type: "project", difficulty: "Intermediate", category: "Arts", description: "Create digital art inspired by a theme" },
-    // New Challenges
-    { id: 16, title: "UI/UX Audit", points: 180, type: "practical", difficulty: "Intermediate", category: "Design", description: "Perform a usability audit on a popular mobile app" },
-    { id: 17, title: "Data Visualization", points: 200, type: "project", difficulty: "Advanced", category: "Tech", description: "Turn raw complex data into an interactive dashboard" },
-    { id: 18, title: "Ethical Leadership Case", points: 110, type: "simulation", difficulty: "Beginner", category: "Business", description: "Solve a complex ethical dilemma in a corporate setting" },
-    { id: 19, title: "Public Speaking Simulator", points: 140, type: "simulation", difficulty: "Intermediate", category: "All", description: "Deliver a 5-minute pitch in a virtual room" }
-]
+import { ALL_CHALLENGES } from "@/lib/challenges-data"
 
 const container = {
     hidden: { opacity: 0 },
@@ -51,9 +35,16 @@ export default function ChallengesSection() {
     useEffect(() => {
         const session = AuthService.getSession()
         if (session) setUser(session)
+
+        const handleUpdate = (e: any) => {
+            if (e.detail) setUser(e.detail)
+        }
+
+        window.addEventListener(SESSION_UPDATED_EVENT, handleUpdate)
+        return () => window.removeEventListener(SESSION_UPDATED_EVENT, handleUpdate)
     }, [])
 
-    const filteredChallenges = allChallenges.filter(c =>
+    const filteredChallenges = ALL_CHALLENGES.filter(c =>
         selectedCategory === "All" || c.category === selectedCategory || c.category === "All"
     )
 
@@ -67,7 +58,7 @@ export default function ChallengesSection() {
             return
         }
 
-        const challenge = allChallenges.find(c => c.id === challengeId)
+        const challenge = ALL_CHALLENGES.find(c => c.id === challengeId)
         if (challenge) {
             const newCompletedIds = [...(user.completedChallengeIds || []), challengeId]
 
@@ -165,9 +156,11 @@ export default function ChallengesSection() {
                                             {challenge.title}
                                         </h3>
                                     </div>
-                                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 text-amber-500 border border-slate-100 dark:border-slate-800">
-                                        <Zap className="w-5 h-5 fill-current" />
-                                    </div>
+                                    {user?.completedChallengeIds?.includes(challenge.id) && (
+                                        <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 border border-emerald-100/50 dark:border-emerald-900/30">
+                                            <CircleCheckBig className="w-5 h-5" />
+                                        </div>
+                                    )}
                                 </div>
 
                                 <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-8 line-clamp-2">

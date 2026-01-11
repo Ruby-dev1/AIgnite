@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import type { LucideIcon } from "lucide-react"
-import { Target, Check, Trophy, Sparkles, AlertCircle, X, ChevronRight } from "lucide-react"
+import { Target, Check, Trophy, Sparkles, AlertCircle, X, ChevronRight, CircleCheckBig } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -31,7 +31,6 @@ interface CareerPathCardProps {
   }
   onChallengeSelect: (challengeId: number) => void
   completedChallenges: number[]
-  onSelectPrimary: (careerId: string) => void
   isPrimary: boolean
 }
 
@@ -39,7 +38,6 @@ export default function CareerPathCard({
   career,
   onChallengeSelect,
   completedChallenges,
-  onSelectPrimary,
   isPrimary
 }: CareerPathCardProps) {
   const [expanded, setExpanded] = useState(false)
@@ -52,7 +50,7 @@ export default function CareerPathCard({
         className={cn(
           "relative overflow-hidden rounded-[2.5rem] p-8 text-white transition-all shadow-xl group cursor-pointer",
           `bg-gradient-to-br ${career.color}`,
-          isPrimary && "ring-4 ring-indigo-500/50 ring-offset-4 dark:ring-offset-slate-950"
+          isPrimary && "border-4 border-white/40 shadow-white/10"
         )}
         onClick={() => setExpanded(!expanded)}
       >
@@ -63,12 +61,6 @@ export default function CareerPathCard({
             <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-md border border-white/20">
               <Icon className="w-8 h-8" />
             </div>
-            {isPrimary && (
-              <div className="px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/20 flex items-center gap-2">
-                <Target className="w-3 h-3" />
-                Primary Goal
-              </div>
-            )}
           </div>
 
           <h3 className="text-2xl font-black mb-2 leading-tight">{career.name}</h3>
@@ -151,7 +143,7 @@ export default function CareerPathCard({
                               : "bg-white dark:bg-slate-700 shadow-sm group-hover/quest:scale-110"
                           )}>
                             {completedChallenges.includes(challenge.id) ? (
-                              <Check className="w-5 h-5" />
+                              <CircleCheckBig className="w-5 h-5" />
                             ) : (
                               <Target className="w-5 h-5 text-slate-400 group-hover/quest:text-indigo-600" />
                             )}
@@ -186,18 +178,6 @@ export default function CareerPathCard({
                   </div>
                 </div>
 
-                {!isPrimary && (
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectPrimary(career.id);
-                      setExpanded(false);
-                    }}
-                    className="w-full py-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm shadow-xl shadow-indigo-500/20 transition-all"
-                  >
-                    Set as Primary Career Path
-                  </Button>
-                )}
               </div>
             </motion.div>
           </div>

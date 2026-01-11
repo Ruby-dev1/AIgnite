@@ -4,7 +4,8 @@ import { useState, useEffect } from "react"
 import CareerPathCard from "./career-path-card"
 import ChallengeModal from "./challenge-modal"
 import { Code2, Stethoscope, Briefcase, Palette, Brush, Sparkles, Compass } from "lucide-react"
-import { AuthService, type UserProfile } from "@/lib/auth-service"
+import { AuthService, type UserProfile, SESSION_UPDATED_EVENT } from "@/lib/auth-service"
+import { ALL_CHALLENGES } from "@/lib/challenges-data"
 import { motion } from "framer-motion"
 
 const careers = [
@@ -102,6 +103,13 @@ export default function CareerExplorer() {
   useEffect(() => {
     const session = AuthService.getSession()
     if (session) setUser(session)
+
+    const handleUpdate = (e: any) => {
+      if (e.detail) setUser(e.detail)
+    }
+
+    window.addEventListener(SESSION_UPDATED_EVENT, handleUpdate)
+    return () => window.removeEventListener(SESSION_UPDATED_EVENT, handleUpdate)
   }, [])
 
   const handleCompleteChallenge = (challengeId: number) => {
@@ -114,12 +122,13 @@ export default function CareerExplorer() {
       return
     }
 
-    // Find which career this challenge belongs to
-    const career = careers.find(c => c.challenges.some(ch => ch.id === challengeId))
-    const challenge = career?.challenges.find(ch => ch.id === challengeId)
+    // Find which career this challenge belongs to in local array
+    const localCareer = careers.find(c => c.challenges.some(ch => ch.id === challengeId))
+    // Get actual challenge data from centralized ALL_CHALLENGES
+    const challenge = ALL_CHALLENGES.find(ch => ch.id === challengeId)
 
-    if (career && challenge) {
-      const currentFieldXP = user.fieldXp?.[career.id] || 0
+    if (localCareer && challenge) {
+      const currentFieldXP = user.fieldXp?.[localCareer.id] || 0
       const newCompletedIds = [...(user.completedChallengeIds || []), challengeId]
 
       AuthService.updateProfile({
@@ -128,7 +137,7 @@ export default function CareerExplorer() {
         completedChallengeIds: newCompletedIds,
         fieldXp: {
           ...user.fieldXp,
-          [career.id]: currentFieldXP + challenge.points
+          [localCareer.id]: currentFieldXP + challenge.points
         }
       })
 
@@ -138,11 +147,6 @@ export default function CareerExplorer() {
     setSelectedChallenge(null)
   }
 
-  const handleSelectPrimary = (careerId: string) => {
-    AuthService.updateProfile({ primaryCareer: careerId })
-    const updated = AuthService.getSession()
-    if (updated) setUser(updated)
-  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -181,7 +185,6 @@ export default function CareerExplorer() {
               career={career}
               onChallengeSelect={setSelectedChallenge}
               completedChallenges={user?.completedChallengeIds || []}
-              onSelectPrimary={handleSelectPrimary}
               isPrimary={user?.primaryCareer === career.id}
             />
           </motion.div>

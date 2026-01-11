@@ -8,7 +8,7 @@ import MentorTip from "./mentor-tip"
 import { Zap, Award, Target, TrendingUp, Sparkles, Compass } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { type CareerRecommendation } from "@/lib/ai-career-service"
-import { AuthService, type UserProfile } from "@/lib/auth-service"
+import { AuthService, type UserProfile, SESSION_UPDATED_EVENT } from "@/lib/auth-service"
 
 interface DashboardProps {
   recommendation?: CareerRecommendation | null
@@ -37,6 +37,13 @@ export default function Dashboard({ recommendation, onboardingSkipped, onStartOn
   useEffect(() => {
     const session = AuthService.getSession()
     if (session) setUser(session)
+
+    const handleUpdate = (e: any) => {
+      if (e.detail) setUser(e.detail)
+    }
+
+    window.addEventListener(SESSION_UPDATED_EVENT, handleUpdate)
+    return () => window.removeEventListener(SESSION_UPDATED_EVENT, handleUpdate)
   }, [])
 
   if (!user) return null
