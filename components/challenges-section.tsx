@@ -60,16 +60,9 @@ export default function ChallengesSection() {
 
         const challenge = ALL_CHALLENGES.find(c => c.id === challengeId)
         if (challenge) {
-            const newCompletedIds = [...(user.completedChallengeIds || []), challengeId]
-
-            AuthService.updateProfile({
-                xp: user.xp + challenge.points,
-                completedChallenges: user.completedChallenges + 1,
-                completedChallengeIds: newCompletedIds
+            AuthService.completeChallenge(challengeId).then(updatedUser => {
+                if (updatedUser) setUser(updatedUser)
             })
-            // Reload user state
-            const updated = AuthService.getSession()
-            if (updated) setUser(updated)
         }
         setSelectedChallenge(null)
     }

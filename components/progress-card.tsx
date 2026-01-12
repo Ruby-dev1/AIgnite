@@ -23,7 +23,7 @@ export default function ProgressCard({ name, progress }: ProgressCardProps) {
       <div className="flex items-center justify-between mb-3">
         <p className="font-bold text-slate-800 dark:text-slate-200">{name}</p>
         <div className="flex items-center gap-1.5">
-          <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">{progress}%</span>
+          <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">{Math.round(progress)}%</span>
           <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
         </div>
       </div>

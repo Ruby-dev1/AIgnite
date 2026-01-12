@@ -219,7 +219,7 @@ export const ALL_CHALLENGES: Challenge[] = [
         points: 140,
         type: "simulation",
         difficulty: "Intermediate",
-        category: "All",
+        category: "Business",
         description: "Deliver a 5-minute pitch in a virtual room",
     }
 ]
@@ -227,3 +227,21 @@ export const ALL_CHALLENGES: Challenge[] = [
 export const getChallengeById = (id: number): Challenge | undefined => {
     return ALL_CHALLENGES.find(c => c.id === id)
 }
+
+export const BADGE_CRITERIA = {
+    "Code Master": [1, 2, 3],
+    "Problem Solver": [4, 16, 17],
+    "Quick Learner": [5, 11, 8],
+    "Team Player": [6, 12, 19],
+    "Creative Mind": [13, 14, 15],
+    "Leader in Making": [7, 9, 18],
+};
+
+export const BADGE_DETAILS = [
+    { id: 1, name: "Code Master", icon: "⚡", description: "Complete core technical set: Website, Debugging, API" },
+    { id: 2, name: "Problem Solver", icon: "🧩", description: "Complete analytical tasks: Case Study, UI/UX, Data Viz" },
+    { id: 3, name: "Quick Learner", icon: "🚀", description: "Complete foundational quizzes in Medical, Style, Market" },
+    { id: 4, name: "Team Player", icon: "👥", description: "Complete collaborative projects: Health Campaign, Runway, Public Speaking" },
+    { id: 5, name: "Creative Mind", icon: "🎨", description: "Complete Arts set: Artwork, Illustration, Animation" },
+    { id: 6, name: "Leader in Making", icon: "👑", description: "Complete Business set: Pitch, Plan, Ethics Case" },
+];

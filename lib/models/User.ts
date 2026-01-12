@@ -11,6 +11,7 @@ const UserSchema = new Schema({
     xp: { type: Number, default: 0 },
     maxXp: { type: Number, default: 1000 },
     badges: { type: Number, default: 0 },
+    unlockedBadges: { type: [String], default: [] },
     completedChallenges: { type: Number, default: 0 },
     completedChallengeIds: { type: [Number], default: [] },
     skills: { type: [String], default: [] },
@@ -37,7 +38,11 @@ const UserSchema = new Schema({
     verificationToken: { type: String },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
-}, { timestamps: true });
+}, {
+    timestamps: true,
+    toJSON: { flattenMaps: true },
+    toObject: { flattenMaps: true }
+});
 
 const User = models.User || model("User", UserSchema);
 

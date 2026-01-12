@@ -39,11 +39,23 @@ export async function POST(req: Request) {
         delete userProfile.password;
         delete userProfile.verificationToken;
 
-        return NextResponse.json({
+        const response = NextResponse.json({
             message: "Login successful",
             user: userProfile,
-            token,
         }, { status: 200 });
+
+        // Set HttpOnly Cookie
+        response.cookies.set({
+            name: "auth-token",
+            value: token,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 60 * 60 * 24 * 7, // 7 days
+            path: "/",
+        });
+
+        return response;
     } catch (error: any) {
         console.error("Login error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

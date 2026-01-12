@@ -128,21 +128,9 @@ export default function CareerExplorer() {
     const challenge = ALL_CHALLENGES.find(ch => ch.id === challengeId)
 
     if (localCareer && challenge) {
-      const currentFieldXP = user.fieldXp?.[localCareer.id] || 0
-      const newCompletedIds = [...(user.completedChallengeIds || []), challengeId]
-
-      AuthService.updateProfile({
-        xp: user.xp + challenge.points,
-        completedChallenges: user.completedChallenges + 1,
-        completedChallengeIds: newCompletedIds,
-        fieldXp: {
-          ...user.fieldXp,
-          [localCareer.id]: currentFieldXP + challenge.points
-        }
+      AuthService.completeChallenge(challengeId).then(updatedUser => {
+        if (updatedUser) setUser(updatedUser)
       })
-
-      const updated = AuthService.getSession()
-      if (updated) setUser(updated)
     }
     setSelectedChallenge(null)
   }

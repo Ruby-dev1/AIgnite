@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import dbConnect from "@/lib/mongodb";
 import User from "@/lib/models/User";
 import jwt from "jsonwebtoken";
@@ -7,13 +8,13 @@ export async function GET(req: Request) {
     try {
         await dbConnect();
 
-        // Get authorization header
-        const authHeader = req.headers.get("authorization");
+        // Get token from cookie
+        const cookieStore = await cookies();
+        const token = cookieStore.get("auth-token")?.value;
         let currentUserId: string | null = null;
 
         // Try to get current user ID from token
-        if (authHeader?.startsWith("Bearer ")) {
-            const token = authHeader.substring(7);
+        if (token) {
             try {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
                 currentUserId = decoded.userId;

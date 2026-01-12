@@ -8,6 +8,7 @@ import MentorTip from "./mentor-tip"
 import { Zap, Award, Target, TrendingUp, Sparkles, Compass } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { type CareerRecommendation } from "@/lib/ai-career-service"
+import { ALL_CHALLENGES, type Challenge } from "@/lib/challenges-data"
 import { AuthService, type UserProfile, SESSION_UPDATED_EVENT } from "@/lib/auth-service"
 
 interface DashboardProps {
@@ -35,8 +36,14 @@ export default function Dashboard({ recommendation, onboardingSkipped, onStartOn
   const [user, setUser] = useState<UserProfile | null>(null)
 
   useEffect(() => {
+    // Initial load from local storage
     const session = AuthService.getSession()
     if (session) setUser(session)
+
+    // Fetch fresh data from server
+    AuthService.refreshSession().then(freshUser => {
+      if (freshUser) setUser(freshUser);
+    });
 
     const handleUpdate = (e: any) => {
       if (e.detail) setUser(e.detail)
@@ -57,17 +64,25 @@ export default function Dashboard({ recommendation, onboardingSkipped, onStartOn
 
   // Dynamic progression based on activity
   const careerProgress = [
-    { id: "it", name: "IT & Technology" },
-    { id: "health", name: "Health Sciences" },
-    { id: "business", name: "Business" },
-    { id: "fashion", name: "Fashion & Design" },
-    { id: "arts", name: "Arts & Creative" },
+    { id: "it", name: "IT & Technology", category: "Tech" },
+    { id: "health", name: "Health Sciences", category: "Health" },
+    { id: "business", name: "Business", category: "Business" },
+    { id: "fashion", name: "Fashion & Design", category: "Design" },
+    { id: "arts", name: "Arts & Creative", category: "Arts" },
   ].map(p => {
-    // specific field XP or 0. Goal is 1000 XP per field.
+    // Calculate total possible XP for this field
+    const totalPossibleXP = ALL_CHALLENGES
+      .filter((c: Challenge) => c.category === p.category)
+      .reduce((sum: number, c: Challenge) => sum + c.points, 0)
+
     const fieldXP = user.fieldXp?.[p.id] || 0
+    // Calculate progress percentage
+    const rawProgress = totalPossibleXP > 0 ? (fieldXP / totalPossibleXP) * 100 : 0
+
     return {
       name: p.name,
-      progress: Math.min(100, (fieldXP / 1000) * 100)
+      // Cap at 100%
+      progress: Math.min(100, rawProgress)
     }
   })
 
@@ -82,7 +97,7 @@ export default function Dashboard({ recommendation, onboardingSkipped, onStartOn
 
   const badgesList = allPossibleBadges.map((badge, index) => ({
     ...badge,
-    unlocked: index < user.badges
+    unlocked: user.unlockedBadges?.includes(badge.name) || false
   }))
 
   return (

@@ -25,6 +25,7 @@ export interface UserProfile {
     primaryCareer?: string
     fieldXp: Record<string, number>
     isVerified?: boolean
+    unlockedBadges?: string[]
 }
 
 const SESSION_KEY = "aignite_session"
@@ -74,7 +75,7 @@ export const AuthService = {
         }
     },
 
-    login: async (email: string, password: string): Promise<{ user?: UserProfile; token?: string; error?: string }> => {
+    login: async (email: string, password: string): Promise<{ user?: UserProfile; error?: string }> => {
         try {
             const response = await fetch("/api/auth/login", {
                 method: "POST",
@@ -82,8 +83,8 @@ export const AuthService = {
                 body: JSON.stringify({ email, password }),
             })
             const data = await response.json()
-            if (response.ok && data.user && data.token) {
-                AuthService.setSession(data.user, data.token)
+            if (response.ok && data.user) {
+                AuthService.setSession(data.user)
             }
             return data
         } catch (error) {
@@ -91,12 +92,9 @@ export const AuthService = {
         }
     },
 
-    setSession: (user: UserProfile, token?: string) => {
+    setSession: (user: UserProfile) => {
         if (typeof window === "undefined") return
         localStorage.setItem(SESSION_KEY, JSON.stringify(user))
-        if (token) {
-            localStorage.setItem(TOKEN_KEY, token)
-        }
         window.dispatchEvent(new CustomEvent(SESSION_UPDATED_EVENT, { detail: user }))
     },
 
@@ -106,13 +104,22 @@ export const AuthService = {
         return data ? JSON.parse(data) : null
     },
 
+    // Token is now managed by HttpOnly cookie, so we can't access it via JS.
+    // This function is kept for backward compatibility but returns null or unused.
     getToken: (): string | null => {
-        if (typeof window === "undefined") return null
-        return localStorage.getItem(TOKEN_KEY)
+        return null;
     },
 
-    logout: () => {
+    logout: async () => {
         if (typeof window === "undefined") return
+
+        try {
+            // Call API to clear cookie
+            await fetch("/api/auth/logout", { method: "POST" });
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+
         localStorage.removeItem(SESSION_KEY)
         localStorage.removeItem(TOKEN_KEY)
         window.dispatchEvent(new CustomEvent(SESSION_UPDATED_EVENT, { detail: null }))
@@ -128,35 +135,86 @@ export const AuthService = {
             fieldXp: updatedData.fieldXp ? { ...session.fieldXp, ...updatedData.fieldXp } : session.fieldXp
         }
 
-        // Level Up Logic - Exponential XP Progression
-        // Formula: maxXp = (previous maxXp × 2) + 100
-        // Progression: 1000 → 2100 → 4300 → 8700 → 17500...
-
+        // Level Up Logic
         while (updatedUser.xp >= updatedUser.maxXp) {
             updatedUser.level += 1
-            // New maxXp = (previous maxXp × 2) + 100
             updatedUser.maxXp = (updatedUser.maxXp * 2) + 100
         }
 
-        // Sync with MongoDB
-        const token = AuthService.getToken();
-        if (token) {
-            try {
-                await fetch("/api/user/update", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify(updatedUser),
-                });
-            } catch (error) {
-                console.error("Failed to sync progress with database:", error);
+        // Check for Badges (Hall of Fame)
+        // Ensure unlockedBadges is initialized
+        if (!updatedUser.unlockedBadges) {
+            updatedUser.unlockedBadges = [];
+        }
+
+        // Import dynamically to avoid circular dependency if any, or just used here
+        const { BADGE_CRITERIA } = require("./challenges-data");
+
+        // Check all badge criteria
+        Object.entries(BADGE_CRITERIA).forEach(([badgeName, criteriaIds]) => {
+            // Check if user has completed all required challenges for this badge
+            // @ts-ignore
+            const hasCompletedAll = criteriaIds.every((id: number) => updatedUser.completedChallengeIds.includes(id));
+
+            // If completed and not already unlocked, unlock it
+            if (hasCompletedAll && !updatedUser.unlockedBadges!.includes(badgeName)) {
+                updatedUser.unlockedBadges!.push(badgeName);
+                updatedUser.badges = updatedUser.unlockedBadges!.length;
+                // Optional: Fire a "Badge Unlocked" toast/event here if frontend logic allows
             }
+        });
+
+        // Sync with MongoDB - Cookie is sent automatically
+        try {
+            await fetch("/api/user/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedUser),
+            });
+        } catch (error) {
+            console.error("Failed to sync progress with database:", error);
         }
 
         AuthService.setSession(updatedUser)
 
         return updatedUser
+    },
+
+    refreshSession: async (): Promise<UserProfile | null> => {
+        try {
+            const response = await fetch("/api/auth/me");
+            if (response.ok) {
+                const data = await response.json();
+                if (data.user) {
+                    AuthService.setSession(data.user);
+                    return data.user;
+                }
+            }
+        } catch (error) {
+            console.error("Failed to refresh session:", error);
+        }
+        return null;
+    },
+
+    completeChallenge: async (challengeId: number): Promise<UserProfile | null> => {
+        try {
+            const response = await fetch("/api/challenge/complete", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ challengeId }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.user) {
+                AuthService.setSession(data.user);
+                return data.user;
+            }
+        } catch (error) {
+            console.error("Failed to complete challenge:", error);
+        }
+        return null;
     }
 }

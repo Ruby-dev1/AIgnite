@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import dbConnect from "@/lib/mongodb";
 import User from "@/lib/models/User";
 import jwt from "jsonwebtoken";
@@ -12,8 +13,8 @@ cloudinary.config({
 
 export async function POST(req: Request) {
     try {
-        const auth = req.headers.get("authorization") || "";
-        const token = auth.startsWith("Bearer ") ? auth.split(" ")[1] : null;
+        const cookieStore = await cookies();
+        const token = cookieStore.get("auth-token")?.value;
 
         // NOTE: In a real app, strict auth check is better, but for this demo we might just proceed if token is missing
         // or rely on client sending it.
