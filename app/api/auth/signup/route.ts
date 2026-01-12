@@ -43,7 +43,8 @@ export async function POST(req: Request) {
             },
         });
 
-        const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/verify?token=${verificationToken}&email=${email}`;
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+        const verificationUrl = `${appUrl}/api/auth/verify?token=${verificationToken}&email=${email}`;
 
         const mailOptions = {
             from: `"AIgnite Support" <${process.env.EMAIL_USER}>`,

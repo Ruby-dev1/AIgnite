@@ -105,13 +105,13 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                         {steps.map((s, i) => (
                             <div key={i} className="flex flex-col items-center space-y-2">
                                 <div className={cn(
-                                    "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500",
+                                    "w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-500",
                                     step >= i ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30" : "bg-white dark:bg-slate-800 text-slate-400"
                                 )}>
-                                    <s.icon className="w-5 h-5" />
+                                    <s.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                                 </div>
                                 <span className={cn(
-                                    "text-xs font-semibold uppercase tracking-wider",
+                                    "text-[10px] sm:text-xs font-semibold uppercase tracking-wider hidden sm:block",
                                     step >= i ? "text-blue-600" : "text-slate-400"
                                 )}>
                                     {s.title}
@@ -150,21 +150,21 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                                     repeat: Infinity,
                                     ease: "easeInOut"
                                 }}
-                                className="relative w-48 h-48"
+                                className="relative w-32 h-32 sm:w-48 sm:h-48"
                             >
-                                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-[3rem] blur-2xl opacity-20 animate-pulse" />
-                                <div className="relative w-full h-full bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-[3rem] shadow-2xl flex items-center justify-center overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-[2rem] sm:rounded-[3rem] blur-2xl opacity-20 animate-pulse" />
+                                <div className="relative w-full h-full bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-[2rem] sm:rounded-[3rem] shadow-2xl flex items-center justify-center overflow-hidden">
                                     <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.2),transparent)]" />
-                                    <Sparkles className="w-24 h-24 text-white drop-shadow-lg" />
+                                    <Sparkles className="w-16 h-16 sm:w-24 sm:h-24 text-white drop-shadow-lg" />
                                 </div>
                             </motion.div>
                         </div>
                         <Button
                             size="lg"
-                            className="w-full text-xl h-16 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-blue-500/25 mb-4"
+                            className="w-full text-lg sm:text-xl h-14 sm:h-16 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-blue-500/25 mb-4"
                             onClick={handleNext}
                         >
-                            Start Journey <ArrowRight className="ml-2 w-6 h-6" />
+                            Start Journey <ArrowRight className="ml-2 w-5 h-5 sm:w-6 sm:h-6" />
                         </Button>
                         <button
                             onClick={onSkip}
@@ -190,23 +190,23 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                                     placeholder="e.g. 3.9 or 92%"
                                     value={data.academics.gpa}
                                     onChange={(e) => setData({ ...data, academics: { ...data.academics, gpa: e.target.value } })}
-                                    className="h-14 text-xl rounded-2xl border-2 focus-visible:ring-blue-500 bg-white/50 dark:bg-slate-800/50"
+                                    className="h-12 sm:h-14 text-lg sm:text-xl rounded-2xl border-2 focus-visible:ring-blue-500 bg-white/50 dark:bg-slate-800/50"
                                 />
                             </div>
                             <div className="space-y-3">
                                 <Label className="text-lg font-semibold ml-1">Favorite Subjects</Label>
-                                <div className="flex gap-3">
+                                <div className="flex gap-2 sm:gap-3">
                                     <Input
                                         placeholder="Add subject..."
                                         value={subjectInput}
                                         onChange={(e) => setSubjectInput(e.target.value)}
                                         onKeyDown={(e) => e.key === "Enter" && addItem("academics.favoriteSubjects", subjectInput)}
-                                        className="h-14 text-lg rounded-2xl border-2 bg-white/50 dark:bg-slate-800/50"
+                                        className="h-12 sm:h-14 text-base sm:text-lg rounded-2xl border-2 bg-white/50 dark:bg-slate-800/50"
                                     />
                                     <Button
                                         type="button"
                                         onClick={() => addItem("academics.favoriteSubjects", subjectInput)}
-                                        className="h-14 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700"
+                                        className="h-12 sm:h-14 px-4 sm:px-6 rounded-2xl bg-blue-600 hover:bg-blue-700"
                                     >
                                         Add
                                     </Button>
@@ -215,7 +215,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                                     {data.academics.favoriteSubjects.map((sub, i) => (
                                         <Badge
                                             key={i}
-                                            className="px-4 py-2 text-sm rounded-xl bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 transition-all hover:pr-8 relative group"
+                                            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-xl bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 transition-all hover:pr-8 relative group"
                                         >
                                             {sub}
                                             <button
@@ -229,13 +229,13 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                                 </div>
                             </div>
                         </div>
-                        <div className="flex justify-between mt-12 gap-4">
-                            <Button variant="ghost" size="lg" onClick={handleBack} className="rounded-xl h-14 px-8">Back</Button>
+                        <div className="flex justify-between mt-8 sm:mt-12 gap-3 sm:gap-4">
+                            <Button variant="ghost" size="lg" onClick={handleBack} className="rounded-xl h-12 sm:h-14 px-6 sm:px-8">Back</Button>
                             <Button
                                 size="lg"
                                 onClick={handleNext}
                                 disabled={!data.academics.gpa || data.academics.favoriteSubjects.length === 0}
-                                className="rounded-xl h-14 px-10 bg-blue-600 hover:bg-blue-700"
+                                className="rounded-xl h-12 sm:h-14 px-8 sm:px-10 bg-blue-600 hover:bg-blue-700"
                             >
                                 Next <ArrowRight className="ml-2 w-5 h-5" />
                             </Button>
@@ -254,17 +254,17 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                         <div className="space-y-8">
                             <div className="space-y-3">
                                 <Label className="text-lg font-semibold ml-1">Your Interests</Label>
-                                <div className="flex gap-3">
+                                <div className="flex gap-2 sm:gap-3">
                                     <Input
                                         placeholder="Gaming, Writing, Tech..."
                                         value={interestInput}
                                         onChange={(e) => setInterestInput(e.target.value)}
                                         onKeyDown={(e) => e.key === "Enter" && addItem("interests", interestInput)}
-                                        className="h-14 text-lg rounded-2xl border-2 bg-white/50 dark:bg-slate-800/50"
+                                        className="h-12 sm:h-14 text-base sm:text-lg rounded-2xl border-2 bg-white/50 dark:bg-slate-800/50"
                                     />
                                     <Button
                                         onClick={() => addItem("interests", interestInput)}
-                                        className="h-14 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700"
+                                        className="h-12 sm:h-14 px-4 sm:px-6 rounded-2xl bg-blue-600 hover:bg-blue-700"
                                     >
                                         Add
                                     </Button>
@@ -273,7 +273,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                                     {data.interests.map((item, i) => (
                                         <Badge
                                             key={i}
-                                            className="px-4 py-2 text-sm rounded-xl bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 transition-all hover:pr-8 relative group"
+                                            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-xl bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 transition-all hover:pr-8 relative group"
                                         >
                                             {item}
                                             <button
@@ -287,13 +287,13 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                                 </div>
                             </div>
                         </div>
-                        <div className="flex justify-between mt-12 gap-4">
-                            <Button variant="ghost" size="lg" onClick={handleBack} className="rounded-xl h-14 px-8">Back</Button>
+                        <div className="flex justify-between mt-8 sm:mt-12 gap-3 sm:gap-4">
+                            <Button variant="ghost" size="lg" onClick={handleBack} className="rounded-xl h-12 sm:h-14 px-6 sm:px-8">Back</Button>
                             <Button
                                 size="lg"
                                 onClick={handleNext}
                                 disabled={data.interests.length === 0}
-                                className="rounded-xl h-14 px-10 bg-blue-600 hover:bg-blue-700"
+                                className="rounded-xl h-12 sm:h-14 px-8 sm:px-10 bg-blue-600 hover:bg-blue-700"
                             >
                                 Next <ArrowRight className="ml-2 w-5 h-5" />
                             </Button>
@@ -312,17 +312,17 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                         <div className="space-y-8">
                             <div className="space-y-3">
                                 <Label className="text-lg font-semibold ml-1">Add Skills</Label>
-                                <div className="flex gap-3">
+                                <div className="flex gap-2 sm:gap-3">
                                     <Input
                                         placeholder="Design, Logic, Leadership..."
                                         value={skillInput}
                                         onChange={(e) => setSkillInput(e.target.value)}
                                         onKeyDown={(e) => e.key === "Enter" && addItem("skills", skillInput)}
-                                        className="h-14 text-lg rounded-2xl border-2 bg-white/50 dark:bg-slate-800/50"
+                                        className="h-12 sm:h-14 text-base sm:text-lg rounded-2xl border-2 bg-white/50 dark:bg-slate-800/50"
                                     />
                                     <Button
                                         onClick={() => addItem("skills", skillInput)}
-                                        className="h-14 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700"
+                                        className="h-12 sm:h-14 px-4 sm:px-6 rounded-2xl bg-blue-600 hover:bg-blue-700"
                                     >
                                         Add
                                     </Button>
@@ -331,7 +331,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                                     {data.skills.map((item, i) => (
                                         <Badge
                                             key={i}
-                                            className="px-4 py-2 text-sm rounded-xl bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 transition-all hover:pr-8 relative group"
+                                            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-xl bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 transition-all hover:pr-8 relative group"
                                         >
                                             {item}
                                             <button
@@ -345,13 +345,13 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                                 </div>
                             </div>
                         </div>
-                        <div className="flex justify-between mt-12 gap-4">
-                            <Button variant="ghost" size="lg" onClick={handleBack} className="rounded-xl h-14 px-8">Back</Button>
+                        <div className="flex justify-between mt-8 sm:mt-12 gap-3 sm:gap-4">
+                            <Button variant="ghost" size="lg" onClick={handleBack} className="rounded-xl h-12 sm:h-14 px-6 sm:px-8">Back</Button>
                             <Button
                                 size="lg"
                                 onClick={handleNext}
                                 disabled={data.skills.length === 0}
-                                className="rounded-xl h-14 px-10 bg-blue-600 hover:bg-blue-700"
+                                className="rounded-xl h-12 sm:h-14 px-8 sm:px-10 bg-blue-600 hover:bg-blue-700"
                             >
                                 Next <ArrowRight className="ml-2 w-5 h-5" />
                             </Button>
@@ -370,17 +370,17 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                         <div className="space-y-8">
                             <div className="space-y-3">
                                 <Label className="text-lg font-semibold ml-1">Extracurriculars</Label>
-                                <div className="flex gap-3">
+                                <div className="flex gap-2 sm:gap-3">
                                     <Input
                                         placeholder="Debate, Volunteering, Sports..."
                                         value={ecaInput}
                                         onChange={(e) => setEcaInput(e.target.value)}
                                         onKeyDown={(e) => e.key === "Enter" && addItem("ecas", ecaInput)}
-                                        className="h-14 text-lg rounded-2xl border-2 bg-white/50 dark:bg-slate-800/50"
+                                        className="h-12 sm:h-14 text-base sm:text-lg rounded-2xl border-2 bg-white/50 dark:bg-slate-800/50"
                                     />
                                     <Button
                                         onClick={() => addItem("ecas", ecaInput)}
-                                        className="h-14 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700"
+                                        className="h-12 sm:h-14 px-4 sm:px-6 rounded-2xl bg-blue-600 hover:bg-blue-700"
                                     >
                                         Add
                                     </Button>
@@ -389,7 +389,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                                     {data.ecas.map((item, i) => (
                                         <Badge
                                             key={i}
-                                            className="px-4 py-2 text-sm rounded-xl bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 transition-all hover:pr-8 relative group"
+                                            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-xl bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 transition-all hover:pr-8 relative group"
                                         >
                                             {item}
                                             <button
@@ -403,14 +403,14 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                                 </div>
                             </div>
                         </div>
-                        <div className="flex justify-between mt-12 gap-4">
-                            <Button variant="ghost" size="lg" onClick={handleBack} className="rounded-xl h-14 px-8">Back</Button>
+                        <div className="flex justify-between mt-8 sm:mt-12 gap-3 sm:gap-4">
+                            <Button variant="ghost" size="lg" onClick={handleBack} className="rounded-xl h-12 sm:h-14 px-6 sm:px-8">Back</Button>
                             <Button
                                 size="lg"
                                 onClick={handleFinish}
-                                className="rounded-xl h-14 px-10 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:shadow-xl transition-all"
+                                className="rounded-xl h-12 sm:h-14 px-8 sm:px-10 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:shadow-xl transition-all"
                             >
-                                Reveal My Path <Sparkles className="ml-2 w-5 h-5" />
+                                Finish <Sparkles className="ml-2 w-5 h-5" />
                             </Button>
                         </div>
                     </OnboardingStep>
@@ -424,8 +424,8 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                         title="Connecting the Dots"
                         description="Analyzing millions of data points to find your perfect fit."
                     >
-                        <div className="flex flex-col items-center justify-center py-16 space-y-10">
-                            <div className="relative w-32 h-32">
+                        <div className="flex flex-col items-center justify-center py-10 sm:py-16 space-y-8 sm:space-y-10">
+                            <div className="relative w-24 h-24 sm:w-32 sm:h-32">
                                 <motion.div
                                     animate={{ rotate: 360 }}
                                     transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
@@ -437,7 +437,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                                     className="absolute inset-2 rounded-full border-4 border-dashed border-purple-600/30"
                                 />
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <Loader2 className="w-16 h-16 text-blue-600 animate-spin" />
+                                    <Loader2 className="w-12 h-12 sm:w-16 sm:h-16 text-blue-600 animate-spin" />
                                 </div>
                             </div>
                             <LoadingMessages />
@@ -470,11 +470,11 @@ function LoadingMessages() {
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+                className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
             >
                 {messages[index]}
             </motion.p>
-            <p className="text-slate-400 font-medium tracking-wide">Hang tight, excellence takes time.</p>
+            <p className="text-sm sm:text-base text-slate-400 font-medium tracking-wide px-4">Hang tight, excellence takes time.</p>
         </div>
     )
 }
