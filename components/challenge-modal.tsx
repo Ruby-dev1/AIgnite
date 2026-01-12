@@ -23,25 +23,6 @@ export default function ChallengeModal({ challengeId, onComplete, onClose, isCom
 
   const isQuiz = challenge.questions && challenge.questions.length > 0
 
-  const handleAnswer = (answerIndex: number) => {
-    if (!isQuiz) return
-
-    const newAnswers = [...selectedAnswers]
-    newAnswers[currentQuestion] = answerIndex
-    setSelectedAnswers(newAnswers)
-
-    const isCorrect = answerIndex === challenge.questions[currentQuestion].correct
-    if (isCorrect) {
-      setScore(score + Math.floor(challenge.points / challenge.questions.length))
-    }
-
-    if (currentQuestion < challenge.questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1)
-    } else {
-      setCompleted(true)
-    }
-  }
-
   const handleComplete = () => {
     setCompleted(true)
   }
@@ -103,11 +84,15 @@ export default function ChallengeModal({ challengeId, onComplete, onClose, isCom
                     {challenge.questions[currentQuestion].q}
                   </h4>
 
-                  <div className="space-y-3">
+                  <div className="space-y-3 mb-8">
                     {challenge.questions[currentQuestion].options.map((option: string, idx: number) => (
                       <button
                         key={idx}
-                        onClick={() => handleAnswer(idx)}
+                        onClick={() => {
+                          const newAnswers = [...selectedAnswers]
+                          newAnswers[currentQuestion] = idx
+                          setSelectedAnswers(newAnswers)
+                        }}
                         className={`w-full p-5 rounded-2xl border-2 transition-all text-left font-semibold group ${selectedAnswers[currentQuestion] === idx
                           ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 shadow-lg ring-4 ring-indigo-500/20"
                           : "border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-300"
@@ -125,6 +110,28 @@ export default function ChallengeModal({ challengeId, onComplete, onClose, isCom
                       </button>
                     ))}
                   </div>
+
+                  <button
+                    onClick={() => {
+                      const answerIndex = selectedAnswers[currentQuestion]
+                      if (answerIndex === undefined) return
+
+                      const isCorrect = answerIndex === challenge.questions[currentQuestion].correct
+                      if (isCorrect) {
+                        setScore(score + Math.floor(challenge.points / challenge.questions.length))
+                      }
+
+                      if (currentQuestion < challenge.questions.length - 1) {
+                        setCurrentQuestion(currentQuestion + 1)
+                      } else {
+                        setCompleted(true)
+                      }
+                    }}
+                    disabled={selectedAnswers[currentQuestion] === undefined}
+                    className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/20 disabled:shadow-none"
+                  >
+                    {currentQuestion < challenge.questions.length - 1 ? "Next Question" : "Finish Quiz"}
+                  </button>
                 </>
               ) : (
                 <div className="text-center py-12">

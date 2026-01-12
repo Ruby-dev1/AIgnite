@@ -48,9 +48,9 @@ export default function Navigation({
           <div className="flex items-center gap-3 group cursor-pointer" onClick={() => setCurrentPage("dashboard")}>
             <motion.div
               whileHover={{ scale: 1.05, filter: "brightness(1.1)" }}
-              className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-cyan-300 via-blue-300 to-purple-300 rounded-[1.25rem] flex items-center justify-center shadow-lg shadow-indigo-500/20 transition-all duration-300"
+              className="flex items-center justify-center transition-all duration-300"
             >
-              <img src="/icon.png" alt="AIgnite Logo" className="w-6 h-6 sm:w-7 sm:h-7" />
+              <img src="/logo.png" alt="AIgnite Logo" className="h-10 w-auto sm:h-11 object-contain" />
             </motion.div>
             <h1 className="text-xl sm:text-2xl font-black tracking-tighter bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 bg-clip-text text-transparent group-hover:opacity-80 transition-opacity">
               AIgnite

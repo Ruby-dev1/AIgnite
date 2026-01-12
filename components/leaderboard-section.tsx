@@ -161,9 +161,7 @@ export default function LeaderboardSection() {
                                 className="order-2 md:order-1 relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900/40 dark:to-blue-900/40 border border-slate-200 dark:border-slate-700/50 shadow-xl"
                             >
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/40 dark:bg-white/5 rounded-full blur-3xl -mr-16 -mt-16" />
-                                <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] dark:opacity-[0.05] pointer-events-none">
-                                    <span className="text-[10rem] font-black tracking-tighter text-slate-900 dark:text-white">2</span>
-                                </div>
+
                                 <div className="relative z-10">
                                     <div className="flex items-center justify-between mb-4 sm:mb-6 opacity-50">
                                         <div className="text-4xl sm:text-6xl font-black text-slate-300 dark:text-slate-700">#2</div>
@@ -194,9 +192,7 @@ export default function LeaderboardSection() {
                                 className="order-1 md:order-2 relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 bg-gradient-to-br from-amber-50 to-yellow-100 dark:from-amber-900/40 dark:to-yellow-900/40 border border-amber-200 dark:border-amber-700/50 shadow-2xl md:scale-110 md:z-10"
                             >
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/40 dark:bg-white/5 rounded-full blur-3xl -mr-16 -mt-16" />
-                                <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] dark:opacity-[0.06] pointer-events-none">
-                                    <span className="text-[12rem] font-black tracking-tighter text-amber-900 dark:text-amber-100">1</span>
-                                </div>
+
                                 <div className="relative z-10">
                                     <div className="flex items-center justify-between mb-4 sm:mb-6 opacity-80">
                                         <div className="text-4xl sm:text-6xl font-black text-amber-200 dark:text-amber-800/50">#1</div>
@@ -227,9 +223,7 @@ export default function LeaderboardSection() {
                                 className="order-3 relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/40 dark:to-amber-900/40 border border-orange-200 dark:border-orange-700/50 shadow-xl"
                             >
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/40 dark:bg-white/5 rounded-full blur-3xl -mr-16 -mt-16" />
-                                <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] dark:opacity-[0.05] pointer-events-none">
-                                    <span className="text-[10rem] font-black tracking-tighter text-slate-900 dark:text-white">3</span>
-                                </div>
+
                                 <div className="relative z-10">
                                     <div className="flex items-center justify-between mb-4 sm:mb-6 opacity-50">
                                         <div className="text-4xl sm:text-6xl font-black text-orange-200 dark:text-orange-800/50">#3</div>
