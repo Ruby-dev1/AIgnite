@@ -35,7 +35,8 @@ export async function POST(req: Request) {
             },
         });
 
-        const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetToken}&email=${email}`;
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+        const resetUrl = `${appUrl}/reset-password?token=${resetToken}&email=${email}`;
 
         const mailOptions = {
             from: `"AIgnite Support" <${process.env.EMAIL_USER}>`,
