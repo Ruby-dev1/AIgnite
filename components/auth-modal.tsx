@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, Mail, Lock, User, ChevronDown, Loader2, Eye, EyeOff, AlertCircle } from "lucide-react"
+import { X, Mail, Lock, User, ChevronDown, Loader2, Eye, EyeOff, AlertCircle, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AuthService, type UserProfile } from "@/lib/auth-service"
 import { toast } from "sonner"
@@ -22,6 +22,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     const [bio, setBio] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const [generalError, setGeneralError] = useState("")
+    const [successMessage, setSuccessMessage] = useState("")
     const [showPassword, setShowPassword] = useState(false)
 
     // Field-specific errors
@@ -41,6 +42,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             setBio("")
         }
     }, [mode])
+
+    const switchMode = (newMode: "login" | "signup" | "forgot") => {
+        setSuccessMessage("") // Clear success message on manual switch
+        setMode(newMode)
+    }
 
     const validateForm = () => {
         let isValid = true
@@ -106,6 +112,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                     toast.success("Verification email sent!", {
                         description: "Please check your inbox to verify your account.",
                     })
+                    setSuccessMessage("Verification email sent! Please check your inbox.")
                     setMode("login")
                 }
             } else if (mode === "forgot") {
@@ -116,6 +123,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                     toast.success("Reset link sent!", {
                         description: "If an account exists, you will receive an email shortly.",
                     })
+                    setSuccessMessage("Reset link sent! If an account exists, you will receive an email shortly.")
                     setMode("login")
                 }
             } else {
@@ -190,6 +198,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                                 <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-sm font-semibold text-center flex items-center justify-center gap-2">
                                     <AlertCircle className="w-4 h-4" />
                                     {generalError}
+                                </div>
+                            )}
+
+                            {successMessage && (
+                                <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-500 text-sm font-semibold text-center flex items-center justify-center gap-2">
+                                    <CheckCircle className="w-4 h-4" />
+                                    {successMessage}
                                 </div>
                             )}
 
@@ -303,7 +318,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                                     <div className="flex justify-end">
                                         <button
                                             type="button"
-                                            onClick={() => setMode("forgot")}
+                                            onClick={() => switchMode("forgot")}
                                             className="text-xs font-bold text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                                         >
                                             Forgot password?
@@ -329,7 +344,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                                     <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
                                         Don't have an account?{" "}
                                         <button
-                                            onClick={() => setMode("signup")}
+                                            onClick={() => switchMode("signup")}
                                             className="font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors hover:underline"
                                         >
                                             Sign up
@@ -340,7 +355,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                                     <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
                                         Already have an account?{" "}
                                         <button
-                                            onClick={() => setMode("login")}
+                                            onClick={() => switchMode("login")}
                                             className="font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors hover:underline"
                                         >
                                             Sign in
